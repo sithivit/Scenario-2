@@ -1,6 +1,5 @@
 # Import necessary modules
 import pygame
-import random
 from googletrans import Translator
 from DNFGenerator import DNFGenerator
 from logicGenerator import get_questions
@@ -33,7 +32,8 @@ theme2_center = pygame.math.Vector2(1050, 650)
 
 # Set up questions and their corresponding answers
 random_question = ""
-questions = ["10 + 5 = 15", "15 + 6 = 20", "22 - 12 = 8", "1 + 23 = 24", "5 - 0 = 5", "21 - 9 = 100"]
+#questions = ["10 + 5 = 15", "15 + 6 = 20", "22 - 12 = 8", "1 + 23 = 24", "5 - 0 = 5", "21 - 9 = 100"]
+questions = list_questions()
 question_answers = [True, False, False, True, True, False]
 questions1 = ["10 - 5 = 5", "135 - 6 = 20", "22 - 101 = 8", "1 - 3 = -2", "51 - 1 = 50", "210 - 9 = 190"]
 question1_answers = [True, False, False, True, True, False]
@@ -126,7 +126,8 @@ def is_mouse_over_button(mouse_pos, button_center):
 
 def generate_question(questions):
     # Only included for testing. The Qs will be replaced by DNF generator/ same w answers
-    random_question = random.choice(questions)
+    random_question = DNFGenerator(random.choice(questions))
+    #random_question = random.choice(questions)
     print(random_question)
     return random_question
 
@@ -249,10 +250,10 @@ def draw_window3(window, option1, option2, questions, COLOUR1, COLOUR2, COLOUR3,
     text_rect = text.get_rect(center=option2.center)
     window.blit(text, text_rect)
 
-    questions = list_questions()
-    print(questions)
+    #questions = list_questions()
+    #print(questions)
 
-    random_question = DNFGenerator(random.choice(questions))
+    #random_question = DNFGenerator(random.choice(questions))
     text = font.render(random_question.expression, True, COLOUR4)
     text_rect = text.get_rect(center=(pygame.Rect(300, 200, 600, 100)).center)
     window.blit(text, (text_rect))
