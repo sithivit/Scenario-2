@@ -2,7 +2,7 @@ import openai
 
 
 def get_questions(max_variable):
-    openai.api_key = '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'
+    openai.api_key = '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'
 
     messages = [
         {"role": "system",

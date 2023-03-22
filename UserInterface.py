@@ -250,6 +250,7 @@ def draw_window3(window, option1, option2, questions, COLOUR1, COLOUR2, COLOUR3,
     window.blit(text, text_rect)
 
     questions = list_questions()
+    print(questions)
 
     random_question = DNFGenerator(random.choice(questions))
     text = font.render(random_question.expression, True, COLOUR4)
