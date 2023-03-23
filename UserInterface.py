@@ -307,24 +307,6 @@ def draw_window5(window, option1, option2, questions, COLOUR1, COLOUR2, COLOUR3,
     text_rect = text.get_rect(centerx=WIDTH / 2, y=65)
     window.blit(text, text_rect)
 
-    # Render the truth table
-    expr_row = '(A AND B) AND (C OR D)'
-    header_row = '   |  A  |  B  |  C  |  D  |  X  |'
-    text = font.render(expr_row, True, COLOUR4)
-    window.blit(text, (190, 170))
-    text = font.render(header_row, True, COLOUR4)
-    window.blit(text, (180, 200))
-    row_y = 230
-    var_names = ['A', 'B', 'C', 'D', 'X']
-    for i, row in enumerate(table):
-        row_str = ' | '.join([' T ' if v else ' F ' for v in row[:-1]]) + ' | ' + (' T ' if row[-1] else ' F ')
-        text = font.render(row_str, True, COLOUR4)
-        window.blit(text, (190, row_y))
-        for j, var_name in enumerate(var_names):
-            text = font.render(var_name, True, COLOUR4)
-            text_rect = text.get_rect(center=(220 + 70*j, 215))
-            window.blit(text, text_rect)
-        row_y += 30
 
     pygame.display.update()
 
