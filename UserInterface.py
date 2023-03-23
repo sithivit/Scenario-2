@@ -310,9 +310,6 @@ def draw_window5(window, option1, option2, questions, COLOUR1, COLOUR2, COLOUR3,
 
     pygame.display.update()
 
-    pygame.display.update()
-
-
 
 def generate_truth_table(var1, var2, var3, var4, expr):
     table = []
