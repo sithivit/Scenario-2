@@ -2,6 +2,7 @@
 import pygame
 import random
 from googletrans import Translator
+from logicGenerator import get_answer_satisfy, get_answer_validation
 
 # Set constants for window dimensions and colours
 WIDTH, HEIGHT = 1200, 800
@@ -32,7 +33,7 @@ questions = ["(A /\ B) \/ (~C)", "(A) \/ (B /\ C)", "(A /\ ~B) \/ (C)", "(A /\ B
              "(A /\ ~B) \/ (B /\ ~C)", "(~A /\ ~B) \/ (~B /\ ~C)", "(A) \/ (B /\ C)", "(~A /\ B) \/ (~B /\ C)", "(~A /\ B /\ C) \/ (B /\ C)",
              "(A /\ B /\ C) \/ (A /\ ~C)", "(A /\ C) \/ (~A /\ B /\ C)", "(~A /\ ~B) \/ (B /\ C)", "(~A /\ B) \/ (B /\ C)", "(A /\ B /\ C) \/ (~A /\ ~B /\ ~C)",
              "(A) \/ (B) \/ (C)"]
-question_answers = [True, False, False, True, True, False]
+question_answers = [get_answer_validation(i) for i in questions]
 questions1 = ["10 - 5 = 5", "135 - 6 = 20", "22 - 101 = 8", "1 - 3 = -2", "51 - 1 = 50", "210 - 9 = 190"]
 question1_answers = [True, False, False, True, True, False]
 questions2 = ["5 - 5 = 0", "5 = 1", "100 - 10 = 80", "1 - 3 = -200", "511 - 1 = 510", "2 - 9 = -7"]

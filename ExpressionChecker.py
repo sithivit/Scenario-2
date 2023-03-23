@@ -1,4 +1,4 @@
-from TruthTable_ import expressionHandler
+from TruthTable import expressionHandler
 import re
 
 def replace_operators(string):
