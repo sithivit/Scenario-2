@@ -1,12 +1,7 @@
 # Import necessary modules
 import pygame
-from googletrans import Translator
-from DNFGenerator import DNFGenerator
-from logicGenerator import get_questions
-from Integrated import list_questions
 import random
-
-
+from googletrans import Translator
 
 # Set constants for window dimensions and colours
 WIDTH, HEIGHT = 1200, 800
@@ -23,7 +18,8 @@ NAVY_BLUE = (30, 144, 255)
 # List of words that are used in the program
 ENGLISH = ["DNF Expressions", "START", "ACCESSIBILITY", "DNF EG is a learning tool designed to enhance your logic skills by generating",
            "random problem sets and giving you the opprtunity to test yourself.", "Validity Exercises", "Satisfiability Exercises",
-           "Truth Table Exercises", "TRUE", "FALSE", "Correct!", "Incorrect!", "Select Language", "GO BACK"]
+           "Truth Table Exercises", "YES", "NO", "Correct!", "Incorrect!", "Select Language", "GO BACK", "Is the expression valid?", "Is the expression satisfiable?",
+           "Select an option to fill in the missing output column"]
 
 # Define radius for buttons and their center positions
 RADIUS = 45
@@ -32,8 +28,7 @@ theme2_center = pygame.math.Vector2(1050, 650)
 
 # Set up questions and their corresponding answers
 random_question = ""
-#questions = ["10 + 5 = 15", "15 + 6 = 20", "22 - 12 = 8", "1 + 23 = 24", "5 - 0 = 5", "21 - 9 = 100"]
-questions = list_questions()
+questions = ["10 + 5 = 15", "15 + 6 = 20", "22 - 12 = 8", "1 + 23 = 24", "5 - 0 = 5", "21 - 9 = 100"]
 question_answers = [True, False, False, True, True, False]
 questions1 = ["10 - 5 = 5", "135 - 6 = 20", "22 - 101 = 8", "1 - 3 = -2", "51 - 1 = 50", "210 - 9 = 190"]
 question1_answers = [True, False, False, True, True, False]
@@ -126,8 +121,7 @@ def is_mouse_over_button(mouse_pos, button_center):
 
 def generate_question(questions):
     # Only included for testing. The Qs will be replaced by DNF generator/ same w answers
-    random_question = DNFGenerator(random.choice(questions))
-    #random_question = random.choice(questions)
+    random_question = random.choice(questions)
     print(random_question)
     return random_question
 
@@ -194,6 +188,7 @@ def draw_window2(window, validity_button_rect, satisfiability_button_rect, truth
     pygame.draw.rect(window, satisfiability_button_colour, satisfiability_button_rect) # Satisfiability Exercises
     pygame.draw.rect(window, truthtables_button_colour, truthtables_button_rect) # Truth Table Exercises
 
+
     font = pygame.font.SysFont(CURRENT_FONT, 30)
     text = font.render(CURRENT_LANGUAGE[5], True, COLOUR4) # "Validity Exercises"
     window.blit(text, (validity_button_rect.centerx - text.get_width() // 2, validity_button_rect.centery - text.get_height() // 2))
@@ -250,13 +245,13 @@ def draw_window3(window, option1, option2, questions, COLOUR1, COLOUR2, COLOUR3,
     text_rect = text.get_rect(center=option2.center)
     window.blit(text, text_rect)
 
-    #questions = list_questions()
-    #print(questions)
-
-    #random_question = DNFGenerator(random.choice(questions))
-    text = font.render(random_question.expression, True, COLOUR4)
+    text = font.render(random_question, True, COLOUR4)
     text_rect = text.get_rect(center=(pygame.Rect(300, 200, 600, 100)).center)
     window.blit(text, (text_rect))
+
+    text = font.render(CURRENT_LANGUAGE[14], True, COLOUR4)
+    text_rect = text.get_rect(centerx=WIDTH / 2, y=125)
+    window.blit(text, text_rect)
 
     pygame.display.update()
 
@@ -276,7 +271,7 @@ def setup_window5():
 
     return window, option5, option6, False, False
 
-def draw_window5(window, option1, option2, questions, COLOUR1, COLOUR2, COLOUR3, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT): #might add OPTION 3 # VALIDITY
+def draw_window5(window, option1, option2, questions, COLOUR1, COLOUR2, COLOUR3, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT):
     window.fill(COLOUR1)
 
     # Check if the mouse is hovering over any button
@@ -291,16 +286,13 @@ def draw_window5(window, option1, option2, questions, COLOUR1, COLOUR2, COLOUR3,
     else:
         option2_colour = COLOUR2
 
-
-    global random_question
-    if not random_question:
-        random_question = generate_question(questions)
-
+    # Generate the truth table
+    table = generate_truth_table('A', 'B', 'C', 'D', lambda a, b, c, d: True)  # Replace the lambda with your boolean expression
 
     pygame.draw.rect(window, (option1_colour), option1) # True button
     pygame.draw.rect(window, (option2_colour), option2) # False button
 
-    pygame.draw.rect(window, (COLOUR2), (200, 200, 300, 400)) # Question box
+    pygame.draw.rect(window, (COLOUR2), (200, 200, 400, 400)) # Question box
 
     font = pygame.font.SysFont(CURRENT_FONT, 30)
     text = font.render(CURRENT_LANGUAGE[8].upper(), True, COLOUR4) # "True"
@@ -311,10 +303,57 @@ def draw_window5(window, option1, option2, questions, COLOUR1, COLOUR2, COLOUR3,
     text_rect = text.get_rect(center=option2.center)
     window.blit(text, text_rect)
 
-    text = font.render(random_question, True, COLOUR4)
-    window.blit(text, (250, 400))
+    text = font.render(CURRENT_LANGUAGE[16], True, COLOUR4)
+    text_rect = text.get_rect(centerx=WIDTH / 2, y=65)
+    window.blit(text, text_rect)
+
+    # Render the truth table
+    expr_row = '(A AND B) AND (C OR D)'
+    header_row = '   |  A  |  B  |  C  |  D  |  X  |'
+    text = font.render(expr_row, True, COLOUR4)
+    window.blit(text, (190, 170))
+    text = font.render(header_row, True, COLOUR4)
+    window.blit(text, (180, 200))
+    row_y = 230
+    var_names = ['A', 'B', 'C', 'D', 'X']
+    for i, row in enumerate(table):
+        row_str = ' | '.join([' T ' if v else ' F ' for v in row[:-1]]) + ' | ' + (' T ' if row[-1] else ' F ')
+        text = font.render(row_str, True, COLOUR4)
+        window.blit(text, (190, row_y))
+        for j, var_name in enumerate(var_names):
+            text = font.render(var_name, True, COLOUR4)
+            text_rect = text.get_rect(center=(220 + 70*j, 215))
+            window.blit(text, text_rect)
+        row_y += 30
 
     pygame.display.update()
+
+
+
+
+
+
+    # Render the truth table
+    #row_y = 220
+    #for row in table:
+    #    row_str = ' | '.join(['T' if v else 'F' for v in row[:-1]]) + ' | ' + ('T' if row[-1] else 'F')
+    #    text = font.render(row_str, True, COLOUR4)
+    #    window.blit(text, (220, row_y))
+    #    row_y += 30
+
+    pygame.display.update()
+
+
+def generate_truth_table(var1, var2, var3, var4, expr):
+    table = []
+    for v1 in [True, False]:
+        for v2 in [True, False]:
+            for v3 in [True, False]:
+                for v4 in [True, False]:
+                    output = expr(v1, v2, v3, v4)
+                    table.append((v1, v2, v3, v4, output))
+    return table
+
 
 def setup_window6():
 
@@ -501,6 +540,7 @@ def main():
                 elif satisfiability_clicked:
                     window, option3, option4, option3_clicked, option4_clicked = setup_window4()
                     running4 = True
+                    CURRENT_LANGUAGE[14] = CURRENT_LANGUAGE[15]
                     while running4:
                         for event in pygame.event.get():
                             if event.type == pygame.QUIT:
