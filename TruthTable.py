@@ -351,7 +351,6 @@ def replace_operators(string):
 class expressionHandler:
     def __init__(self, s):
         self.user_input = [replace_operators(s)]
-        print(self.user_input)
         self.variables = []
         self.ans = [[]]
         new_input_list = union_variable_set(self.user_input)

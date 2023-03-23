@@ -5,6 +5,7 @@ class DNFGenerator(object):
     def __init__(self, expression):
         self.expression = expression
         temp = expressionHandler(expression)
+        self.valid_expression = temp.user_input
         self.parameters = temp.getParameters()
         self.truth_table = temp.getTruthtable()
 
