@@ -76,4 +76,4 @@ def get_table(question):
         condition = [*i]
         table.append(condition+[' '])
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))
-    return table
+    return tabulate(table, headers='firstrow', tablefmt='fancy_grid')
