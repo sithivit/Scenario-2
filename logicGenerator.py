@@ -1,8 +1,24 @@
+import openai
 from DNFGenerator import DNFGenerator
 import random
 
+def get_questions(max_variable):
+    openai.api_key = "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"
 
-'''
+    messages = [
+        {"role": "system",
+         "content": f"Can you create 5 random solvable propositional logic expressions with each max {max_variable} variables using \/ for or /\ for and -> for imply ~ for not <=> for equivalent syntax and using A B C ... as variable"}
+    ]
+
+    chat = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo", messages=messages
+    )
+
+    reply = chat.choices[0].message.content
+
+    messages.append({"role": "assistant", "content": reply})
+    return reply, messages
+
 def list_questions():
     done = False
     result = []
@@ -13,7 +29,6 @@ def list_questions():
             result.append(i.split('.')[1])
         done = True
     return result
-'''
 
 def replace_character(string, old, new):
     copy = ""
