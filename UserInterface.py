@@ -28,7 +28,10 @@ theme2_center = pygame.math.Vector2(1050, 650)
 
 # Set up questions and their corresponding answers
 random_question = ""
-questions = ["10 + 5 = 15", "15 + 6 = 20", "22 - 12 = 8", "1 + 23 = 24", "5 - 0 = 5", "21 - 9 = 100"]
+questions = ["(A /\ B) \/ (~C)", "(A) \/ (B /\ C)", "(A /\ ~B) \/ (C)", "(A /\ B) \/ (B /\ C)", "(~A) \/ (B /\ C)", "(A /\ B /\ C)",
+             "(A /\ ~B) \/ (B /\ ~C)", "(~A /\ ~B) \/ (~B /\ ~C)", "(A) \/ (B /\ C)", "(~A /\ B) \/ (~B /\ C)", "(~A /\ B /\ C) \/ (B /\ C)",
+             "(A /\ B /\ C) \/ (A /\ ~C)", "(A /\ C) \/ (~A /\ B /\ C)", "(~A /\ ~B) \/ (B /\ C)", "(~A /\ B) \/ (B /\ C)", "(A /\ B /\ C) \/ (~A /\ ~B /\ ~C)",
+             "(A) \/ (B) \/ (C)"]
 question_answers = [True, False, False, True, True, False]
 questions1 = ["10 - 5 = 5", "135 - 6 = 20", "22 - 101 = 8", "1 - 3 = -2", "51 - 1 = 50", "210 - 9 = 190"]
 question1_answers = [True, False, False, True, True, False]
