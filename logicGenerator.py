@@ -1,6 +1,19 @@
 from DNFGenerator import DNFGenerator
-from tabulate import tabulate
+import random
 
+
+'''
+def list_questions():
+    done = False
+    result = []
+    while not done:
+        questions, messages = get_questions(5)
+        temp = [i for i in questions.split('\n') if i != '']
+        for i in temp:
+            result.append(i.split('.')[1])
+        done = True
+    return result
+'''
 
 def replace_character(string, old, new):
     copy = ""
@@ -62,7 +75,6 @@ def get_answer_satisfy(question):
             valid = True
     return satisfy
 
-
 def get_table(question):
     DNF = DNFGenerator(question)
     parameters = DNF.parameters
@@ -81,5 +93,10 @@ def get_table(question):
         for i, j in variable_condition:
             temp = replace_character(temp, i, j)
         answers.append(bool(eval(temp)))
-    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))
-    return tabulate(table, headers='firstrow', tablefmt='fancy_grid'), answers
+    new_answers = []
+    for answer in answers:
+        if answer:
+            new_answers.append(1)
+        else:
+            new_answers.append(0)
+    return table, len_parameters, new_answers

@@ -2,14 +2,14 @@
 import pygame
 import random
 from googletrans import Translator
-from logicGenerator import get_answer_satisfy, get_answer_validation
+from logicGenerator import get_answer_satisfy, get_answer_validation, get_table
 
 
 # Set constants for window dimensions and colours
 WIDTH, HEIGHT = 1200, 800
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-DARK_BLUE = (0, 0 , 64)
+DARK_BLUE = (0, 0, 64)
 DARKER_BLUE = (0, 0, 32)
 BLUE = (13, 27, 42)
 LIGHT_BLUE = (173, 216, 230)
@@ -29,8 +29,7 @@ theme1_center = pygame.math.Vector2(1050, 550)
 theme2_center = pygame.math.Vector2(1050, 650)
 
 # Set up questions and their corresponding answers
-questions1 = ["10 - 5 = 5", "135 - 6 = 20", "22 - 101 = 8", "1 - 3 = -2", "51 - 1 = 50", "210 - 9 = 190"]
-question1_answers = [True, False, False, True, True, False]
+
 questions2 = ["5 - 5 = 0", "5 = 1", "100 - 10 = 80", "1 - 3 = -200", "511 - 1 = 510", "2 - 9 = -7"]
 question2_answers = [True, False, False, False, True, True]
 
@@ -39,7 +38,7 @@ translator = Translator()
 def setup(CURRENT_LANGUAGE):
     # Loads all librariies in module pygame
     pygame.init()
-
+    pygame.mouse.set_cursor(*pygame.cursors.arrow)
     # Set up the screen
     window = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -108,7 +107,6 @@ def draw_window(window, start_button_rect, accessibility_button_rect, COLOUR1, C
 def check_button_click(button):
     # Checks if the button has been clicked
     mouse_pos = pygame.mouse.get_pos()
-    print(mouse_pos)
     if button.collidepoint(mouse_pos):
         return True
     else:
@@ -121,7 +119,6 @@ def retrieve_from_file():
         for line in lines:
             expressions.append(line.strip())  # strip() removes the trailing newline character
     file.close()
-    print(expressions)
     return expressions
 
 def add_to_file(expression):
@@ -133,15 +130,14 @@ def add_to_file(expression):
 random_question = ""
 questions = retrieve_from_file()
 question_answers = [get_answer_validation(i) for i in questions]
+question1_answers = [get_answer_satisfy(j) for j in questions]
 
 def is_mouse_over_button(mouse_pos, button_center):
     return (mouse_pos - button_center).length() <= RADIUS
 
 
 def generate_question(questions):
-    # Only included for testing. The Qs will be replaced by DNF generator/ same w answers
     random_question = random.choice(questions)
-    print(random_question)
     return random_question
 
 def check_answer(window, answer, answers, questions, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT):
@@ -161,14 +157,14 @@ def check_answer(window, answer, answers, questions, COLOUR4, CURRENT_LANGUAGE, 
 def correct_window(window, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT):
     font = pygame.font.SysFont(CURRENT_FONT, 50)
     text = font.render(CURRENT_LANGUAGE[10], True, COLOUR4) # "Correct!"
-    window.blit(text, (WIDTH // 2 - (text.get_width() // 2), 50))
+    window.blit(text, (WIDTH // 2 - (text.get_width() // 2), 0))
     pygame.display.update()
     pygame.time.wait(2000)
 
 def incorrect_window(window, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT):
     font = pygame.font.SysFont(CURRENT_FONT, 50)
     text = font.render(CURRENT_LANGUAGE[11], True, COLOUR4) # "Incorrect!"
-    window.blit(text, (WIDTH // 2 - (text.get_width() // 2), 50))
+    window.blit(text, (WIDTH // 2 - (text.get_width() // 2), 0))
     pygame.display.update()
     pygame.time.wait(2000)
 
@@ -291,63 +287,76 @@ def setup_window4():
 
     return window, option3, option4, False, False
 
-def setup_window5():
+def setup_window5(questions):
     window = pygame.display.set_mode((WIDTH, HEIGHT))
 
-    option5 = pygame.Rect(700, 150, 300, 100)  # True
-    option6 = pygame.Rect(700, 350, 300, 100)  # False
+    global random_question
 
-    return window, option5, option6, False, False
+    #if not random_question:
+    random_question = generate_question(questions)
 
-def draw_window5(window, option1, option2, questions, COLOUR1, COLOUR2, COLOUR3, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT):
+    table, no_of_variables, table_answers = get_table(random_question)
+    wrong_answers = generate_wrong_answers(no_of_variables)
+    option5 = pygame.Rect(700, 200, 90, 2**no_of_variables * 50 + 50)  # True
+    option6 = pygame.Rect(800, 200, 90, 2**no_of_variables * 50 + 50)  # False
+
+    return window, option5, option6, False, False, random_question, wrong_answers
+
+def draw_window5(window, correct_button, wrong_button, random_question, wrong_answers, COLOUR1, COLOUR2, COLOUR3, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT):
     window.fill(COLOUR1)
 
     # Check if the mouse is hovering over any button
     mouse_pos = pygame.mouse.get_pos()
-    if option1.collidepoint(mouse_pos):
-        option1_colour = COLOUR3
+    if correct_button.collidepoint(mouse_pos):
+        correct_button_colour = COLOUR3
     else:
-        option1_colour = COLOUR2
+        correct_button_colour = COLOUR2
 
-    if option2.collidepoint(mouse_pos):
-        option2_colour = COLOUR3
+    if wrong_button.collidepoint(mouse_pos):
+        wrong_button_colour = COLOUR3
     else:
-        option2_colour = COLOUR2
-
-    # Generate the truth table
-    table = generate_truth_table('A', 'B', 'C', 'D', lambda a, b, c, d: True)  # Replace the lambda with your boolean expression
-
-    pygame.draw.rect(window, (option1_colour), option1) # True button
-    pygame.draw.rect(window, (option2_colour), option2) # False button
-
-    pygame.draw.rect(window, (COLOUR2), (200, 200, 400, 400)) # Question box
+        wrong_button_colour = COLOUR2
 
     font = pygame.font.SysFont(CURRENT_FONT, 30)
-    text = font.render(CURRENT_LANGUAGE[8].upper(), True, COLOUR4) # "True"
-    text_rect = text.get_rect(center=option1.center)
-    window.blit(text, text_rect)
-
-    text = font.render(CURRENT_LANGUAGE[9].upper(), True, COLOUR4) # "False"
-    text_rect = text.get_rect(center=option2.center)
-    window.blit(text, text_rect)
 
     text = font.render(CURRENT_LANGUAGE[16], True, COLOUR4)
     text_rect = text.get_rect(centerx=WIDTH / 2, y=65)
     window.blit(text, text_rect)
 
 
+    table, no_of_variables, table_answers = get_table(random_question)
+    for i in range(len(table)):
+        for j in range(len(table[i])):
+            text = font.render((table[i][j]), True, COLOUR4)
+            window.blit(text, (100 + j * 100, 200 + i * 50))
+
+    pygame.draw.rect(window, (correct_button_colour), correct_button) # True button
+    pygame.draw.rect(window, (wrong_button_colour), wrong_button) # False button
+
+    for i in range(len(table_answers)):
+
+        text = font.render((str(table_answers[i])), True, COLOUR4)
+        text_rect = text.get_rect(centerx=(correct_button.centerx), y=(250 + i * 50))
+        window.blit(text, text_rect)
+
+    for j in range(len(wrong_answers)):
+        text = font.render((str(wrong_answers[j])), True, COLOUR4)
+        text_rect = text.get_rect(centerx=(wrong_button.centerx), y=(250 + j * 50))
+        window.blit(text, text_rect)
+
+
     pygame.display.update()
 
 
-def generate_truth_table(var1, var2, var3, var4, expr):
-    table = []
-    for v1 in [True, False]:
-        for v2 in [True, False]:
-            for v3 in [True, False]:
-                for v4 in [True, False]:
-                    output = expr(v1, v2, v3, v4)
-                    table.append((v1, v2, v3, v4, output))
-    return table
+def create_buttons(button1, button2):
+    random_assignment = random.choice([0,1])
+    if random_assignment == 0:
+        correct_button = button1
+        wrong_button = button2
+    else:
+        correct_button = button2
+        wrong_button = button1
+    return correct_button, wrong_button
 
 
 def setup_window6():
@@ -564,11 +573,16 @@ def check_if_hovering(button, mouse_pos, COLOUR2, COLOUR3):
     return button_colour
 
 
+def generate_wrong_answers(no_of_variables):
+    wrong_answers = []
+    for a in range(2**no_of_variables):
+        wrong_answers.append(random.choice([0, 1]))
+    return wrong_answers
+
 def translate_tool(language, ENGLISH):
     CURRENT_LANGUAGE = []
     for i in range(len(ENGLISH)):
         text = ENGLISH[i]
-        print(i)
         CURRENT_LANGUAGE.append(translator.translate(text, dest= language).text)
 
     return CURRENT_LANGUAGE
@@ -597,16 +611,12 @@ def main():
                     start_clicked = True
                 elif check_button_click(accessibility_button_rect):
                     accessibility_clicked = True
-                    print("access clicked")
                 elif is_mouse_over_button(pygame.mouse.get_pos(), theme1_center):
-                    print("DARK_THEME")
                     COLOUR1 = BLUE
                     COLOUR2 = DARKER_BLUE
                     COLOUR3 = DARK_BLUE
                     COLOUR4 = LIGHT_BLUE
-
                 elif is_mouse_over_button(pygame.mouse.get_pos(), theme2_center):
-                    print("LIGHT_THEME")
                     COLOUR1 = SKY_BLUE
                     COLOUR2 = ROYAL_BLUE
                     COLOUR3 = NAVY_BLUE
@@ -673,33 +683,32 @@ def main():
                                     answer = True
                                 elif check_button_click(option4):
                                     answer = False
-                                result, random_question = check_answer(window, answer, question1_answers, questions1, COLOUR4,
+                                result, random_question = check_answer(window, answer, question1_answers, questions, COLOUR4,
                                                                        CURRENT_LANGUAGE, CURRENT_FONT)
                                 if result:
                                     correct_answers = correct_answers + 1
                                     print(correct_answers)
 
-
-                        draw_window3(window, option3, option4, questions1, COLOUR1, COLOUR2, COLOUR3, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT)
+                        draw_window3(window, option3, option4, questions, COLOUR1, COLOUR2, COLOUR3, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT)
                 elif truthtables_clicked:
-                    window, option5, option6, option5_clicked, option6_clicked = setup_window5()
+                    window, option5, option6, option5_clicked, option6_clicked, random_question, wrong_answers = setup_window5(questions)
                     running5 = True
+                    correct_button, wrong_button = create_buttons(option5, option6)
                     while running5:
                         for event in pygame.event.get():
                             if event.type == pygame.QUIT:
                                 running5 = False
                                 pygame.quit()
                             elif event.type == pygame.MOUSEBUTTONDOWN:
-                                if check_button_click(option5):
-                                    answer = True
-                                elif check_button_click(option6):
+                                if check_button_click(correct_button):
+                                    correct_window(window, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT)
+                                    #window, option5, option6, option5_clicked, option6_clicked, random_question, wrong_answers = setup_window5(questions)
+                                elif check_button_click(wrong_button):
                                     answer = False
-                                result, random_question = check_answer(window, answer, question2_answers, questions2,
-                                                                       COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT)
-                                if result:
-                                    correct_answers = correct_answers + 1
+                                    incorrect_window(window, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT)
+                                window, option5, option6, option5_clicked, option6_clicked, random_question, wrong_answers = setup_window5(questions)
 
-                        draw_window5(window, option5, option6, questions2, COLOUR1, COLOUR2, COLOUR3, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT)
+                        draw_window5(window, correct_button, wrong_button, random_question, wrong_answers, COLOUR1, COLOUR2, COLOUR3, COLOUR4, CURRENT_LANGUAGE, CURRENT_FONT)
 
                 elif add_a_question_clicked:
                     retrieve_from_file()
@@ -733,8 +742,6 @@ def main():
                                     new_expression += " )"
                                 if check_button_click(remove_button):
                                     new_expression = new_expression [:-1]
-                                print(new_expression)
-                                #display_expression(new_expression)
                                 if check_button_click(confirm_button):
                                     add_to_file(new_expression)
                                     questions.append(new_expression)
