@@ -72,8 +72,14 @@ def get_table(question):
     table = [[i for i in parameters]+[question]]
     possible_conditions = [bin(i).replace("0b", "") for i in range(2 ** len_parameters)]
     possible_conditions = [(len_parameters - len(i)) * '0' + i for i in possible_conditions]
+    answers = []
     for i in possible_conditions:
         condition = [*i]
         table.append(condition+[' '])
+        variable_condition = zip(parameters, condition)
+        temp = DNFExpression
+        for i, j in variable_condition:
+            temp = replace_character(temp, i, j)
+        answers.append(bool(eval(temp)))
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))
-    return tabulate(table, headers='firstrow', tablefmt='fancy_grid')
+    return tabulate(table, headers='firstrow', tablefmt='fancy_grid'), answers
